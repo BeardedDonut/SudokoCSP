@@ -75,7 +75,7 @@ public class Cell {
     @Override
     public String toString() {
         StringBuilder x = new StringBuilder();
-        x.append("id:\t"+id + "\tvalue:\t" + currentValue);
+        x.append("id:\t" + id + "\tvalue:\t" + currentValue);
         return x.toString();
     }
     // </editor-fold>
