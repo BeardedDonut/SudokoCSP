@@ -88,6 +88,18 @@ public class State {
         this.domains = domains;
     }
 
+    public String printStateBoard(int boardSize, List<Cell> cells) {
+        StringBuilder board = new StringBuilder();
+
+        for(int x=0; x<boardSize; x++) {
+            for (int y=0; y < boardSize; y++) {
+                board.append(this.assignments.get(cells.get(x * boardSize + y))+ "|");
+            }
+            board.append("\n");
+        }
+
+        return board.toString();
+    }
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();

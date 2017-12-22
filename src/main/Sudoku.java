@@ -61,10 +61,10 @@ public class Sudoku {
         takenTime = 0.00f;
 
         int numberOfCells = boardSize * boardSize;
-        for (int i = 0; 0 < numberOfCells; i++) {
+        for (int i = 0; i < numberOfCells; i++) {
             cells.add(new Cell(i, null));
         }
-
+        System.out.println("Ha!");
         generateConstraints();
     }
 
@@ -88,7 +88,7 @@ public class Sudoku {
             this.constraintRules.add(rule);
         }
 
-        // SUB-SQUARES constraints
+        //TODO create regions instead of sub squares
         int gridSize = (int) Math.sqrt(boardSize);
         for(int row=0;row<gridSize;row++){
             for(int col=0;col<gridSize;col++){
@@ -337,6 +337,7 @@ public class Sudoku {
         return true;
     }
 
+    //TODO Comment
     public State backtrackSearchInit(int type) {
         this.nodes = 0;
         long tStart = System.nanoTime();
@@ -347,6 +348,7 @@ public class Sudoku {
         return endState;
     }
 
+    //TODO Comment
     public State recursiveBacktrackSearch(State state, int type) {
         nodes++;
         if (isSudokuSolved(state)) {
@@ -433,4 +435,71 @@ public class Sudoku {
 
         return false;
     }
+
+    // <editor-fold desc="getters and setters">
+    public RegionMap getRegionMap() {
+        return regionMap;
+    }
+
+    public void setRegionMap(RegionMap regionMap) {
+        this.regionMap = regionMap;
+    }
+
+    public Integer getBoardSize() {
+        return boardSize;
+    }
+
+    public void setBoardSize(Integer boardSize) {
+        this.boardSize = boardSize;
+    }
+
+    public List<Cell> getCells() {
+        return cells;
+    }
+
+    public void setCells(List<Cell> cells) {
+        this.cells = cells;
+    }
+
+    public List<Constraint> getConstraintRules() {
+        return constraintRules;
+    }
+
+    public void setConstraintRules(List<Constraint> constraintRules) {
+        this.constraintRules = constraintRules;
+    }
+
+    public State getBase() {
+        return base;
+    }
+
+    public void setBase(State base) {
+        this.base = base;
+    }
+
+    public Map<Cell, List<Constraint>> getCellCsRules() {
+        return cellCsRules;
+    }
+
+    public void setCellCsRules(Map<Cell, List<Constraint>> cellCsRules) {
+        this.cellCsRules = cellCsRules;
+    }
+
+    public int getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(int nodes) {
+        this.nodes = nodes;
+    }
+
+    public double getTakenTime() {
+        return takenTime;
+    }
+
+    public void setTakenTime(double takenTime) {
+        this.takenTime = takenTime;
+    }
+
+    // </editor-fold>
 }
