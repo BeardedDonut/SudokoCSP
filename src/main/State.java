@@ -43,14 +43,14 @@ public class State {
     public State assign(Cell cell, Object value) {
         State newState = new State();
 
-        newState.setAssignments(new HashMap<Cell, Object>(assignments));
+        newState.setAssignments(new HashMap<Cell, Object>(this.assignments));
         newState.getAssignments().put(cell, value);
 
-        newState.setDomains(new HashMap<Cell, List<Object>>(domains));
+        newState.setDomains(new HashMap<Cell, List<Object>>(this.domains));
 
         List<Object> varDomain = new LinkedList<Object>();
         varDomain.add(value);
-        newState.domains.put(cell, varDomain);
+        newState.getDomains().put(cell, varDomain);
 
         return newState;
     }

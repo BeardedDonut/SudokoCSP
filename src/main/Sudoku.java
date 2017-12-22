@@ -9,10 +9,6 @@ public class Sudoku {
 
     // <editor-fold desc="properties">
     /**
-     * Region map for the Sudoku
-     */
-    private RegionMap regionMap;
-    /**
      * Size of the Sudoku board, commonly is 9
      */
     private Integer boardSize;
@@ -32,6 +28,12 @@ public class Sudoku {
      * A map whch relate each cell with it's constraints
      */
     private Map<Cell, List<Constraint>> cellCsRules;
+
+    /**
+     * A map that maps each region Id to it's region map
+     */
+    private Map<Integer, RegionMap> regions;
+
     /**
      * A number which measures the number of expanded nodes
      */
@@ -49,12 +51,12 @@ public class Sudoku {
      * @param size:   size of the map
      * @param regMap: given region map
      */
-    public Sudoku(int size, RegionMap regMap) {
+    public Sudoku(int size) {
         this.boardSize = size;
         this.base = new State();
-        this.regionMap = regionMap;
 
         constraintRules = new ArrayList<Constraint>();
+        this.regions = new HashMap<Integer, RegionMap>();
         cells = new ArrayList<Cell>();
 
         nodes = 0;
@@ -66,6 +68,18 @@ public class Sudoku {
         }
         System.out.println("Ha!");
         generateConstraints();
+    }
+
+    public RegionMap getRegion(Integer regId) {
+
+        if(this.regions.get(regId) == null) {
+            RegionMap temp = new RegionMap();
+            this.regions.put(regId, temp);
+            return temp;
+        }
+
+        return this.regions.get(regId);
+
     }
 
     public void generateConstraints() {
@@ -88,18 +102,30 @@ public class Sudoku {
             this.constraintRules.add(rule);
         }
 
+//        int gridSize = (int) Math.sqrt(boardSize);
+//        for(int row=0;row<gridSize;row++){
+//            for(int col=0;col<gridSize;col++){
+//                Constraint rule = new Constraint("All dif", ConstraintType.REGION);
+//                for(int rowSS=0;rowSS<gridSize;rowSS++){
+//                    for(int colSS=0;colSS<gridSize;colSS++){
+//                        rule.getRetlatedCells().add(this.constraintRules.get(rowSS+row*gridSize).getRetlatedCells().get(colSS+col*gridSize));
+//                    }
+//                }
+//                this.constraintRules.add(rule);
+//            }
+//        }
+
+    }
+
+    public void generateRegionConstraints(){
         //TODO create regions instead of sub squares
-        int gridSize = (int) Math.sqrt(boardSize);
-        for(int row=0;row<gridSize;row++){
-            for(int col=0;col<gridSize;col++){
-                Constraint rule = new Constraint("All Different Constriant", ConstraintType.REGION);
-                for(int rowSS=0;rowSS<gridSize;rowSS++){
-                    for(int colSS=0;colSS<gridSize;colSS++){
-                        rule.getRetlatedCells().add(this.constraintRules.get(rowSS+row*gridSize).getRetlatedCells().get(colSS+col*gridSize));
-                    }
-                }
-                this.constraintRules.add(rule);
+        for(Integer regId: regions.keySet()) {
+            Constraint cst = new Constraint("All different in Region",ConstraintType.REGION);
+            List<Cell> affectedCells = regions.get(regId).getCells();
+            for(Cell afCell: affectedCells) {
+                cst.getRetlatedCells().add(afCell);
             }
+            this.constraintRules.add(cst);
         }
 
     }
@@ -358,6 +384,8 @@ public class Sudoku {
         Cell cell;
         if (type == 2) {
             cell = getUnassignedCellWithHeuristicMCVAndMinimumConstrainingVariable(state);
+        } else if (type == 1){
+            cell = getUnassignedCellWithHeuristicMCV(state);
         } else {
             cell = getUnassignedCell(state);
         }
@@ -372,11 +400,12 @@ public class Sudoku {
             values.remove(value);
             values.add(0, value);
         }
+
         for (Object value : values) {
             State a2 = state.assign(cell, value);
 
             if (type > 0) {
-                a2 = forwardChecking(state, cell);
+                a2 = forwardChecking(a2, cell);
             }
 
             if (!isStateConsistent(a2)) {
@@ -437,14 +466,6 @@ public class Sudoku {
     }
 
     // <editor-fold desc="getters and setters">
-    public RegionMap getRegionMap() {
-        return regionMap;
-    }
-
-    public void setRegionMap(RegionMap regionMap) {
-        this.regionMap = regionMap;
-    }
-
     public Integer getBoardSize() {
         return boardSize;
     }
