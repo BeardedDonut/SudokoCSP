@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by navid on 12/21/17.
  */
-public class Constraints {
+class Constraint {
 
     /**
      * A human readable expression of this constraint
@@ -22,7 +22,7 @@ public class Constraints {
      * This field represents cell which are under the influence of t
      * his constraint.
      */
-    private List<Cell> cells;
+    private List<Cell> retlatedCells;
 
     /**
      * Constructor
@@ -30,8 +30,8 @@ public class Constraints {
      * @param description: a human readable description of this constraint
      * @param cst:         Constraint Type indicator
      */
-    public Constraints(String description, ConstraintType cst) {
-        cells = new LinkedList<Cell>();
+    public Constraint(String description, ConstraintType cst) {
+        retlatedCells = new LinkedList<Cell>();
         this.description = description;
         this.myConstraintType = cst;
     }
@@ -39,7 +39,7 @@ public class Constraints {
     public boolean satisfied(State state, final Integer boardSize) {
         boolean[] visited = new boolean[boardSize + 1];
 
-        for (Cell cell : cells) {
+        for (Cell cell : retlatedCells) {
             Integer value = (Integer) state.getAssignments().get(cell);
 
             if (value == null || visited[value]) {
@@ -57,7 +57,7 @@ public class Constraints {
         boolean[] free = new boolean[boardSize + 1];
         int numValues = 0;
 
-        for (Cell cell : cells) {
+        for (Cell cell : retlatedCells) {
             for (Object value : state.getDomainValues(cell)) {
                 if (!free[(Integer) value]) {
                     numValues++;
@@ -73,9 +73,23 @@ public class Constraints {
             }
         }
 
-        if (cells.size() > numValues)
+        if (retlatedCells.size() > numValues)
             return false;
         return true;
+    }
+
+    public boolean isRelatedTo(int cellId) {
+        for (Cell c : this.retlatedCells) {
+            if (cellId == c.getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isRelatedTo(Cell cell) {
+        return this.isRelatedTo(cell.getId());
     }
 
     // <editor-fold desc = "getter and setters and toString">
@@ -85,7 +99,7 @@ public class Constraints {
 
         x.append("Description:\n\t" + description + "\n");
 
-        for (Cell c : cells) {
+        for (Cell c : retlatedCells) {
             x.append(c.toString() + "\n");
         }
 
@@ -108,12 +122,12 @@ public class Constraints {
         this.myConstraintType = myConstraintType;
     }
 
-    public List<Cell> getCells() {
-        return cells;
+    public List<Cell> getRetlatedCells() {
+        return retlatedCells;
     }
 
-    public void setCells(List<Cell> cells) {
-        this.cells = cells;
+    public void setRetlatedCells(List<Cell> retlatedCells) {
+        this.retlatedCells = retlatedCells;
     }
 
     // </editor-fold>
