@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public class State {
 
+    // <editor-fold desc="properties">
+
     /**
      * Current cell assignments
      */
@@ -24,6 +26,11 @@ public class State {
      */
     private Map<Cell, List<Object>> domains = null;
 
+    // </editor-fold>
+
+
+    // <editor-fold desc="Constructors">
+
     /**
      * Constructor
      */
@@ -31,6 +38,11 @@ public class State {
         assignments = new HashMap<Cell, Object>();
         domains = new HashMap<Cell, List<Object>>();
     }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="util functions">
 
     /**
      * This method assigns a new value to a cell and returns
@@ -70,6 +82,9 @@ public class State {
 
         return cell.getDomain();
     }
+
+    // </editor-fold>
+
 
     // <editor-fold desc="getters and setters and toString">
     public Map<Cell, Object> getAssignments() {

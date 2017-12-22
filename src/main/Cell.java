@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class Cell {
 
+    // <editor-fold desc="properties">
+
     /**
      * This field identifies each cell which is
      * corresponding to each cell position
@@ -29,11 +31,16 @@ public class Cell {
      */
     private Object currentValue;
 
+    // </editor-fold>
+
+
+    // <editor-fold desc="constructor">
+
     /**
      * Constructor
      *
-     * @param id
-     * @param value
+     * @param id: Given Id
+     * @param value: Given value
      */
     public Cell(int id, Object value) {
         this.id = id;
@@ -46,6 +53,9 @@ public class Cell {
 
         this.currentValue = value;
     }
+
+    // </editor-fold>
+
 
     // <editor-fold desc="getter and setters and toString">
     public int getId() {

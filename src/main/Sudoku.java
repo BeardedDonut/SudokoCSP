@@ -8,6 +8,7 @@ import java.util.*;
 public class Sudoku {
 
     // <editor-fold desc="properties">
+
     /**
      * Size of the Sudoku board, commonly is 9
      */
@@ -42,8 +43,11 @@ public class Sudoku {
      * Variable used to measure the execution time.
      */
     private double takenTime;
+
     // </editor-fold>
 
+
+    // <editor-fold desc="Constructor">
 
     /**
      * Constructot
@@ -70,6 +74,18 @@ public class Sudoku {
         generateConstraints();
     }
 
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="util functions">
+
+    /**
+     * This method returns the corresponding region map of
+     * the given region id.
+     * @param regId: Region Id
+     * @return: corresponding RegionMap
+     */
     public RegionMap getRegion(Integer regId) {
 
         if(this.regions.get(regId) == null) {
@@ -82,13 +98,16 @@ public class Sudoku {
 
     }
 
+    /**
+     * This method generate Row and Column Constraints
+     */
     public void generateConstraints() {
 
         // ROW constraints
         for (int row = 0; row < boardSize; row++) {
             Constraint rule = new Constraint("All Diffrerent Constriant", ConstraintType.ROW);
             for (int col = 0; col < boardSize; col++) {
-                rule.getRetlatedCells().add(cells.get(row * boardSize + col));
+                rule.getRelatedCells().add(cells.get(row * boardSize + col));
             }
             this.constraintRules.add(rule);
         }
@@ -97,33 +116,22 @@ public class Sudoku {
         for (int col = 0; col < boardSize; col++) {
             Constraint rule = new Constraint("All Diffrerent Constriant", ConstraintType.COLUMN);
             for (int row = 0; row < boardSize; row++) {
-                rule.getRetlatedCells().add(cells.get(row * boardSize + col));
+                rule.getRelatedCells().add(cells.get(row * boardSize + col));
             }
             this.constraintRules.add(rule);
         }
-
-//        int gridSize = (int) Math.sqrt(boardSize);
-//        for(int row=0;row<gridSize;row++){
-//            for(int col=0;col<gridSize;col++){
-//                Constraint rule = new Constraint("All dif", ConstraintType.REGION);
-//                for(int rowSS=0;rowSS<gridSize;rowSS++){
-//                    for(int colSS=0;colSS<gridSize;colSS++){
-//                        rule.getRetlatedCells().add(this.constraintRules.get(rowSS+row*gridSize).getRetlatedCells().get(colSS+col*gridSize));
-//                    }
-//                }
-//                this.constraintRules.add(rule);
-//            }
-//        }
-
     }
 
+    /**
+     * This method generates Regional Constraints
+     */
     public void generateRegionConstraints(){
         //TODO create regions instead of sub squares
         for(Integer regId: regions.keySet()) {
-            Constraint cst = new Constraint("All different in Region",ConstraintType.REGION);
+            Constraint cst = new Constraint("All Different Constraint in Region",ConstraintType.REGION);
             List<Cell> affectedCells = regions.get(regId).getCells();
             for(Cell afCell: affectedCells) {
-                cst.getRetlatedCells().add(afCell);
+                cst.getRelatedCells().add(afCell);
             }
             this.constraintRules.add(cst);
         }
@@ -167,6 +175,12 @@ public class Sudoku {
         return list;
     }
 
+    /**
+     * This method returns an unassigned cell in the given state.
+     * This method does not benefit from any heuristics.
+     * @param state: Given state
+     * @return : First unassigned cell it founds
+     */
     public Cell getUnassignedCell(State state) {
         for (Cell c : cells) {
             if (state.getAssignments().get(c) == null) {
@@ -175,7 +189,6 @@ public class Sudoku {
         }
         return null;
     }
-
 
     /**
      * This method finds an unassigned cell
@@ -263,7 +276,7 @@ public class Sudoku {
             Cell currentCell = cellsList.get(i);
 
             for (Constraint cst : this.constraintRules) {
-                if (cst.getRetlatedCells().contains(currentCell)) {
+                if (cst.getRelatedCells().contains(currentCell)) {
                     currentConstrainingDegree++;
                 }
             }
@@ -277,7 +290,6 @@ public class Sudoku {
 
         return fitCell;
     }
-
 
     /**
      * This method finds the best value in a given state
@@ -317,13 +329,19 @@ public class Sudoku {
         return bestValue;
     }
 
-
+    /**
+     * This is Forward checking algorithm.
+     * This method applies forward checking on a given cell in the given state/
+     * @param state: Given state
+     * @param givenCell: Given cell
+     * @return: a state which shows how forward checking impacts the state
+     */
     public State forwardChecking(State state, Cell givenCell) {
         List<Constraint> relatedConstraintsOfCell = this.findRelatedRules(givenCell);
         Object assignedValue = state.getAssignments().get(givenCell);
 
         for (Constraint cst : relatedConstraintsOfCell) {
-            for (Cell c : cst.getRetlatedCells()) {
+            for (Cell c : cst.getRelatedCells()) {
                 if (c == givenCell) {
                     continue;
                 }
@@ -347,7 +365,6 @@ public class Sudoku {
         return state;
     }
 
-
     /**
      * This methods checks whether given state is consistent or not.
      *
@@ -363,7 +380,17 @@ public class Sudoku {
         return true;
     }
 
-    //TODO Comment
+    /**
+     * BackTracking search algorithm
+     * This method initializes primary variables and then calls the {@link #recursiveBacktrackSearch(State, int)}
+     * to do the job based on the given type;
+     * @param type: type of which algorithm is needed
+     * @return: returns the final state
+     * type 0 = pure backtracking without any heuristics
+     * type 1 = backtracking with Forward Checking enabled
+     * type 2 = backtracking with Forward Checking and applied 3 heuristic which are listed below:
+     * {Most Constrained Variable, Most Constraining Variable, Least Constraining Value}
+     */
     public State backtrackSearchInit(int type) {
         this.nodes = 0;
         long tStart = System.nanoTime();
@@ -374,7 +401,11 @@ public class Sudoku {
         return endState;
     }
 
-    //TODO Comment
+    /**
+     * This is the recursive backtracking algorithm!
+     * @param state: given state
+     * @param type: type of algorithm watch this link for more info {@link #backtrackSearchInit(int)}
+     */
     public State recursiveBacktrackSearch(State state, int type) {
         nodes++;
         if (isSudokuSolved(state)) {
@@ -432,7 +463,7 @@ public class Sudoku {
         this.cellCsRules = new HashMap<Cell, List<Constraint>>();
 
         for (Constraint cst : this.constraintRules) {
-            for (Cell c : cst.getRetlatedCells()) {
+            for (Cell c : cst.getRelatedCells()) {
                 if (cellCsRules.containsKey(c)) {
                     cellCsRules.get(c).add(cst);
                 } else {
@@ -464,6 +495,10 @@ public class Sudoku {
 
         return false;
     }
+
+
+    // </editor-fold>
+
 
     // <editor-fold desc="getters and setters">
     public Integer getBoardSize() {

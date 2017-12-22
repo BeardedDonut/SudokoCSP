@@ -43,7 +43,7 @@ public class Main {
                                     }
                                 }
                             }
-                            // reading area
+                            // reading regions
                             for (int x = 0; x < sudo.getBoardSize(); x++) {
                                 row = in.readLine();
                                 for (int y = 0; y < sudo.getBoardSize(); y++) {
@@ -55,6 +55,7 @@ public class Main {
                                     myReg.addCell(cell);
                                 }
                             }
+                            // generating region constraints based on regions
                             sudo.generateRegionConstraints();
 
                             old_sudo = sudo;
@@ -69,14 +70,12 @@ public class Main {
                         System.out.println(solution.printStateBoard(sudo.getBoardSize(), sudo.getCells()));
                     }
                     board++;
-                    //System.out.println();
                 }
                 in.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error");
-            //System.exit(1);
         }
     }
 
